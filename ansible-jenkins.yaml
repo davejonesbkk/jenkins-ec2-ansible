@@ -16,13 +16,11 @@
   tasks:
 
     - name: Remove Old Java
-      become: true
       yum: name=java-1.7.0 state=removed
       yum: name=java-1.7.0-openjdk state=removed
 
 
     - name: Install Java 1.8 and Wget
-      become: true
       yum: name={{ item }} state=latest
       with_items:
        - wget
