@@ -35,6 +35,11 @@
        url: http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
        dest: /etc/yum.repos.d/jenkins.repo
 
+    - name: Import Jenkins repo key
+      rpm_key:
+        state: present
+        key: https://pkg.jenkins.io/redhat/jenkins.io.key
+
     - name: Install Jenkins
       yum: name=jenkins state=present
 
