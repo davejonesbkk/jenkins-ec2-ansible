@@ -26,4 +26,6 @@ https://stackoverflow.com/questions/41055669/unable-to-connect-to-jenkins-server
 
 https://issues.jenkins-ci.org/browse/JENKINS-45388
 
+If after logging into the GUI you get a blank screen you may need to ssh into the Jenkins server and stop/start the service.
+
 
