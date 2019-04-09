@@ -1,0 +1,68 @@
+--- #aws ec2 install and jenkins
+  
+- hosts: aws-servers
+
+  remote_user: ec2-user
+
+  sudo: yes
+
+  become_method: sudo
+
+  gather_facts: no
+
+  connection: ssh
+
+
+  tasks:
+
+    - name: Remove Old Java
+      become: true
+      yum: name=java-1.7.0 state=removed
+      yum: name=java-1.7.0-openjdk state=removed
+
+
+    - name: Install Java 1.8 and Wget
+      become: true
+      yum: name={{ item }} state=latest
+      with_items:
+       - wget
+       - java-1.8.0-openjdk
+       - java-1.8.0-openjdk-devel
+       - java-1.8.0
+
+    - name: Download Jenkins repo
+      get_url:
+       url: http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
+       dest: /etc/yum.repos.d/jenkins.repo
+
+    - name: Install Jenkins
+      yum: name=jenkins state=present
+
+    - name: Add jenkins to root group
+      shell: sudo usermod -a -G root jenkins
+
+    - name: Start & enable Jenkins
+      service:
+        name: jenkins
+        state: started
+        enabled: true
+        
+   - name: Make Jenkins listen to all external ips
+      shell: sed -i 's/JENKINS_LISTEN_ADDRESS=""/JENKINS_LISTEN_ADDRESS="0.0.0.0"/g' /etc/sysconfig/jenkins
+
+    - name: Start & enable Jenkins
+      service:
+        name: jenkins
+        state: restarted
+        enabled: true
+
+    - name: Sleep for 10 seconds then continue
+      wait_for: timeout=30
+
+    - name: Get Jenkins init password from file
+      shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+      changed_when: false
+      register: result
+
+    - debug:
+       var: result.stdout
